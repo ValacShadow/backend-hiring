@@ -69,3 +69,6 @@ docker compose up
   - `submit/` allows submitting jobs.
   - `status/<job_id>/` lets you check the status of a specific job.
 
+
+Vikas Saini
+sainivk565@gmail.com

@@ -1,29 +1,85 @@
 from website.models import Site, Job, UserRecords
+from faker import Faker
+import random
+import uuid
 
-# # Add Sites
-# Site.objects.create(name="Customer A", domain="a.com", url="http://a.com", description="Customer A", record_capicity=1)
-# Site.objects.create(name="Customer B", domain="b.com", url="http://b.com", description="Customer B", record_capicity=2)
+fake = Faker()
 
-# # Add Jobs
-# Job.objects.create(name="task_01", execution_time_multiplier=0.001)
-# Job.objects.create(name="task_02", execution_time_multiplier=0.01)
-# Job.objects.create(name="task_03", execution_time_multiplier=0.1)
-# Job.objects.create(name="task_04", execution_time_multiplier=1)
-# Job.objects.create(name="task_05", execution_time_multiplier=10)
+# Function to create jobs
+def create_job(name, execution_time_multiplier):
+    job, created = Job.objects.get_or_create(
+        name=name,
+        defaults={"execution_time_multiplier": execution_time_multiplier},
+    )
+    if created:
+        print(f"Created job {name}")
+    else:
+        print(f"Job {name} already exists")
 
- # Add Sites
-site_a = Site.objects.create(name="Customer A", domain="a.com", url="http://a.com", description="Customer A", record_capicity=3)
-site_b = Site.objects.create(name="Customer B", domain="b.com", url="http://b.com", description="Customer B", record_capicity=2)
-site_c = Site.objects.create(name="Customer C", domain="c.com", url="http://c.com", description="Customer C", record_capicity=1)
+# Create Jobs if not already created
+create_job("task_01", 0.001)
+create_job("task_02", 0.01)
+create_job("task_03", 0.1)
+create_job("task_04", 1)
+create_job("task_05", 10)
 
-# Add Users for Site A
-UserRecords.objects.create(site=site_a, name="John Doe", email="john.doe@a.com", phone="1234567890", address="123 A Street", country="Country A", state="State A", city="City A", pincode="123456", dob="1980-01-01", is_active=True)
-UserRecords.objects.create(site=site_a, name="Jane Smith", email="jane.smith@a.com", phone="1234567891", address="124 A Street", country="Country A", state="State A", city="City A", pincode="123457", dob="1990-02-01", is_active=True)
+# Function to create sites if the URL is unique
+def create_site(name, domain, url, description, record_capicity):
+    site, created = Site.objects.get_or_create(
+        url=url,  # Ensure that the URL is unique
+        defaults={
+            "name": name,
+            "domain": domain,
+            "description": description,
+            "record_capicity": record_capicity,
+        }
+    )
+    if created:
+        print(f"Created site {name} with URL {url}")
+    else:
+        print(f"Site with URL {url} already exists")
 
-# Add Users for Site B
-UserRecords.objects.create(site=site_b, name="Alice Green", email="alice.green@b.com", phone="9876543210", address="125 B Street", country="Country B", state="State B", city="City B", pincode="654321", dob="1985-05-15", is_active=True)
-UserRecords.objects.create(site=site_b, name="Bob Brown", email="bob.brown@b.com", phone="9876543211", address="126 B Street", country="Country B", state="State B", city="City B", pincode="654322", dob="1995-03-25", is_active=True)
+# Add Sites with different record capacities
+create_site("Customer A", "a.com", "http://a.com", "Customer A", 3)  # High capacity
+create_site("Customer B", "b.com", "http://b.com", "Customer B", 2)  # Medium capacity
+create_site("Customer C", "c.com", "http://c.com", "Customer C", 1)  # Low capacity
 
-# Add Users for Site C
-UserRecords.objects.create(site=site_c, name="Alice rt", email="alice.tr@b.com", phone="9876543270", address="125 B Street", country="Country B", state="State B", city="City B", pincode="654321", dob="1985-05-15", is_active=True)
-UserRecords.objects.create(site=site_c, name="POP Brown", email="pop.brown@b.com", phone="9836543211", address="126 B Street", country="Country B", state="State B", city="City B", pincode="654322", dob="1995-03-25", is_active=True)
+# Function to create users based on site record capacity
+def create_users_for_site(site):
+    if site.record_capicity == 1:  # Low capacity
+        num_users = random.randint(10, 100)
+    elif site.record_capicity == 2:  # Medium capacity
+        num_users = random.randint(100, 500)
+    elif site.record_capicity == 3:  # High capacity
+        num_users = random.randint(500, 1000)
+    else:
+        num_users = 0
+
+    print(f"Creating {num_users} users for {site.name} ({site.get_record_capicity_display()})")
+    
+    # Create the users with unique emails by appending a UUID
+    for _ in range(num_users):
+        email = f"{fake.unique.email().split('@')[0]}+{str(uuid.uuid4())[:8]}@{fake.domain_name()}"
+        
+        UserRecords.objects.create(
+            site=site,
+            name=fake.name(),
+            email=email,  # Unique email with appended UUID
+            phone=fake.phone_number(),
+            address=fake.address(),
+            country=fake.country(),
+            state=fake.state(),
+            city=fake.city(),
+            pincode=fake.zipcode(),
+            dob=fake.date_of_birth(),
+            is_active=True
+        )
+
+# Create users for Site A (High capacity)
+create_users_for_site(Site.objects.get(url="http://a.com"))
+
+# Create users for Site B (Medium capacity)
+create_users_for_site(Site.objects.get(url="http://b.com"))
+
+# Create users for Site C (Low capacity)
+create_users_for_site(Site.objects.get(url="http://c.com"))

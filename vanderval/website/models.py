@@ -87,15 +87,15 @@ class JobQueue(models.Model):
     
     def classify_worker(self):
         if self.estimated_time <= 200:
-            self.worker_type = 'worker_1'  # Very Fast
+            self.worker_type = 'worker_1'
         elif 200 < self.estimated_time <= 1000:
-            self.worker_type = 'worker_1'  # Fast
+            self.worker_type = 'worker_1'
         elif 1000 < self.estimated_time <= 2000:
-            self.worker_type = 'worker_2'  # Medium
+            self.worker_type = 'worker_2'
         elif 2000 < self.estimated_time <= 10000:
-            self.worker_type = 'worker_2'  # Slow
+            self.worker_type = 'worker_2'
         elif 10000 < self.estimated_time <= 2000000:
-            self.worker_type = 'worker_3'  # Very Slow
+            self.worker_type = 'worker_3'
         else:
             self.worker_type = 'worker_1'  # Default worker
         return self.worker_type

@@ -50,3 +50,22 @@ in the 1st round of interview, we will discuss the code and build few additional
 ### <i>Name</i>: Rajeev K L
 ### <i>Email</i>: rajeev@almabase.com
 ### <i>JD</i>: [Software Engineer](https://www.almabase.com/careers?ashby_jid=27df3851-fcea-47e2-af51-4c5aec17ff67)
+
+
+## How to Run
+
+### 1. Populate Data
+First, populate the database with the required data by running the following command:
+```bash
+python manage.py test website
+
+docker compose up
+
+
+### Key Points:
+- **Populate Data**: Running `python manage.py test website` will populate the database with necessary data, ensuring a smooth setup.
+- **Run Server**: `docker compose up` starts the application and all necessary services.
+- **API Endpoints**: You can use the provided API endpoints to interact with the application:
+  - `submit/` allows submitting jobs.
+  - `status/<job_id>/` lets you check the status of a specific job.
+

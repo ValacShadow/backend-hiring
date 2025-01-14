@@ -4,7 +4,7 @@ services:
   web:
     build: .
     container_name: vanderval_app
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "python manage.py test website && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     environment:
@@ -24,6 +24,20 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
     depends_on:
       - redis
+      - web
+
+  celery_beat:
+    build: .
+    container_name: celery_beat
+    command: sh -c "celery -A vanderval beat --loglevel=info --scheduler django_celery_beat.schedulers.DatabaseScheduler"
+    environment:
+      - DJANGO_SETTINGS_MODULE=vanderval.settings
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - web
+    volumes:
+      - .:/app
 
   redis:
     image: redis

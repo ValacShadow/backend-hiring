@@ -23,6 +23,12 @@ class Site(models.Model):
     url = models.URLField(unique=True)
     description = models.TextField()
     record_capicity = models.IntegerField(choices=RECORD_CAPACITY_CHOICES)
+    quota_usage = models.IntegerField(default=0)
+    quota_limit = models.IntegerField(default=5)
+
+    @property
+    def can_schedule_task(self):
+        return self.quota_usage < self.quota_limit
 
 
 # you can choose to reuse the User model from django.contrib.auth.models
@@ -94,8 +100,10 @@ class JobQueue(models.Model):
             self.worker_type = 'worker_2'
         elif 2000 < self.estimated_time <= 10000:
             self.worker_type = 'worker_2'
-        elif 10000 < self.estimated_time <= 2000000:
+        elif 10000 < self.estimated_time <= 100000:
             self.worker_type = 'worker_3'
+        elif 100000 < self.estimated_time <= 2000000:
+            self.worker_type = 'worker_4'
         else:
-            self.worker_type = 'worker_1'  # Default worker
+            self.worker_type = 'worker_5'
         return self.worker_type

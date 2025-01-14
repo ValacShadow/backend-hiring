@@ -1,9 +1,16 @@
+import logging
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from django.http import JsonResponse
+from django.db import transaction
+
 from .models import Site, Job, JobQueue
 from .tasks import execute_job
-from django.http import JsonResponse
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -30,9 +37,14 @@ class SubmitJobAPIView(APIView):
 
             # Get the worker's queue based on worker_type
             worker_queue = job_queue.worker_type
+            logger.info(f"Wsite.can_schedule_task: {site.can_schedule_task}")
+            if job_queue.site.can_schedule_task:
+                # Schedule the job for execution on the correct worker
+                logger.info(f"Job {job_queue.id} scheduled for execution on worker {worker_queue}")
+                execute_job.apply_async(args=[job_queue.id], queue=worker_queue)
 
-            # Schedule the job for execution on the correct worker
-            execute_job.apply_async(args=[job_queue.id], queue=worker_queue)
+            # transaction.on_commit(lambda: execute_job.apply_async(args=[job_queue.id], queue=worker_queue))
+
             # execute_job(job_queue_id=job_queue.id)
             
             return Response({"message": "Job submitted", "job_queue_id": job_queue.id})

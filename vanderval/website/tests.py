@@ -59,13 +59,14 @@ def create_users_for_site(site):
     
     # Create the users with unique emails by appending a UUID
     for _ in range(num_users):
-        email = f"{fake.unique.email().split('@')[0]}+{str(uuid.uuid4())[:8]}@{fake.domain_name()}"
+        name = fake.name()
+        # email = f"test_{random.randint(1, 99999)}@test.com"
         
         UserRecords.objects.create(
             site=site,
-            name=fake.name(),
-            email=email,  # Unique email with appended UUID
-            phone=fake.phone_number(),
+            name=name,
+            # email=email,  # Unique email with appended UUID
+            # phone=fake.phone_number(),
             address=fake.address(),
             country=fake.country(),
             state=fake.state(),

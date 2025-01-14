@@ -10,7 +10,7 @@ echo "Starting Celery worker with exponential backoff for retries..."
 
 # Start Celery worker
 for ((i=1; i<=MAX_RETRIES; i++)); do
-    celery -A vanderval worker -Q worker_1,worker_2,worker_3 --loglevel=info && break
+    celery -A vanderval worker -Q worker_1,worker_2,worker_3,worker_4,worker_5 --loglevel=info && break
     echo "Celery failed to start. Retry $i/$MAX_RETRIES in $RETRY_DELAY seconds..."
     sleep $((RETRY_DELAY * i))
 done

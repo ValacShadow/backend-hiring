@@ -15,6 +15,8 @@ RUN apt-get update && \
 # Install Python dependencies
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
+RUN python manage.py migrate django_celery_beat
+RUN python manage.py migrate
 
 # Expose the port the app runs on
 EXPOSE 8000
